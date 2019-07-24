@@ -1,0 +1,28 @@
+{
+    "kind": "small office",
+    "floor": 6,
+    "special_monthly_offer": 400000,
+    "company": [
+        {
+            "name": "Startify",
+            "contact_email": "admin@startify.com",
+            "employee": [
+                {
+                    "first_name": "Karen",
+                    "last_name": "O'Conner",
+                    "preferred_name": "Kay",
+                    "position": "Manager",
+                    "birthday": "1975-03-11",
+                    "email": "koconner@startify.com"
+                },
+                {
+                    "first_name": "Jeff",
+                    "last_name": "Madison",
+                    "position": "Analyst",
+                    "birthday": "1989-02-06",
+                    "email": "jmadison@startify.com"
+                }
+            ]
+        }
+    ]
+}
