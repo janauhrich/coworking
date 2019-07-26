@@ -1,26 +1,66 @@
+[
+    {
+        "kind": "small office",
+        "floor": 6,
+        "special_monthly_offer": 400000,
+        "company": [
+            {
+                "name": "Startify",
+                "contact_email": "admin@startify.com",
+                "employee": [
+                    {
+                        "first_name": "Karen",
+                        "last_name": "O'Conner",
+                        "preferred_name": "Kay",
+                        "position": "Manager",
+                        "birthday": "1975-03-11",
+                        "email": "koconner@startify.com"
+                    },
+                    {
+                        "first_name": "Jeff",
+                        "last_name": "Madison",
+                        "position": "Analyst",
+                        "birthday": "1989-02-06",
+                        "email": "jmadison@startify.com"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "kind": "seat",
+        "floor": 2,
+        "company": [
+            {
+                "name": "Koworq",
+                "contact_email": "admin@koworq.com",
+                "employee": [
+                    {
+                        "first_name": "Chip",
+                        "last_name": "Keller",
+                        "position": "Data Scientist",
+                        "birthday": "1995-02-10",
+                        "email": "koconner@koworq.com"
+                    }
+                ]
+            }
+        ]
+    }
+]
+
+//Just Company
 {
-    "kind": "small office",
-    "floor": 6,
-    "special_monthly_offer": 400000,
     "company": [
         {
-            "name": "Startify",
-            "contact_email": "admin@startify.com",
+            "name": "Plannr",
+            "contact_email": "admin@plannr.com",
             "employee": [
                 {
-                    "first_name": "Karen",
-                    "last_name": "O'Conner",
-                    "preferred_name": "Kay",
-                    "position": "Manager",
-                    "birthday": "1975-03-11",
-                    "email": "koconner@startify.com"
-                },
-                {
-                    "first_name": "Jeff",
-                    "last_name": "Madison",
-                    "position": "Analyst",
-                    "birthday": "1989-02-06",
-                    "email": "jmadison@startify.com"
+                    "first_name": "Kim",
+                    "last_name": "Bobbin",
+                    "position": "Engineer II",
+                    "birthday": "1989-07-11",
+                    "email": "kbobbin@plannr.com"
                 }
             ]
         }
