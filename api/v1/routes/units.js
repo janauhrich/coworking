@@ -5,13 +5,25 @@ const Units = require("../models/units");
 const publicKeys = "_id kind floor special_monthly_offer company";
 const kinds = ["seat", "desk", "small office", "large office", "floor"]
 
-router.get("/", async (req, res, next) => {
+//GET 
+// http://localhost:5000/api/v1/units
+// http://localhost:5000/api/v1/units?kind=desk
+// http://localhost:5000/api/v1/units?floor=2
+// http://localhost:5000/api/v1/units?occupied=true
+router.get("/units", async (req, res, next) => {
   const status = 200;
-  const response = await Units.find(req.query);
+  const query = req.query;
+
+  let response = await Units.find(query);
+
+    if (String(Object.keys(query)).includes(`occupied`)) { 
+      response = await Units.find({ company: { $gt: [] } });
+    }
+   
   res.json({ status, response });
 });
 
-router.post("/", async (req, res, next) => {
+router.post("/units", async (req, res, next) => {
     const status = 201;
     try {
       const units = await Units.create(req.body);
