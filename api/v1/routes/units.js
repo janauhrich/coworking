@@ -25,6 +25,7 @@ router.get("/units", async (req, res, next) => {
 
 //PATCH
 // http://localhost:5000/api/v1/units/5d36b6459505d2086326b425
+
 // got some inspiration on this from  https://dev.to/aurelkurtula/building-a-restful-api-with-express-and-mongodb--3mmh
 router.patch("/units/:id", async (req, res, next) => {
   try {
@@ -88,26 +89,80 @@ router.patch("/units/:id/company", async (req, res, next) => {
 
 router.delete("/units/:id/company", async (req, res, next) => {
   const status = 200;
-   try {
-     const findAndDelete = Units.findById(
-       req.params.id,
-       (err, unit) => {
-         if (err) {
-           console.log(err);
-           return;
-         }
-         unit.company = [];
-         unit.save();
-       }
-     );
-     const response = await Units.findById(req.params.id);
-     res.json({ status, response });
-   } catch (error) {
-     error.status = 404;
-     error.message = "Unit not found";
-     next(error);
-   }
+  try {
+    const findAndDelete = Units.findById(req.params.id, (err, unit) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      unit.company = [];
+      unit.save();
+    });
+    const response = await Units.findById(req.params.id);
+    res.json({ status, response });
+  } catch (error) {
+    error.status = 404;
+    error.message = "Unit not found";
+    next(error);
+  }
 });
+
+//GET
+// http://localhost:5000/api/v1/units/5d36b6c09536830a5b7edac3/company/employees
+router.get("/units/:id/company/employees", async (req, res, next) => {
+  const status = 200;
+  try {
+    const getDoc = await Units.findById(req.params.id);
+    const response = await getDoc.company[0].employee;
+
+    res.json({ status, response });
+  } catch (error) {
+    if (error.path === "_id") {
+      error.status = 404;
+      error.message = "Unit not found";
+    }
+    error.status = 404;
+    error.message = "Company not found";
+    next(error);
+  }
+});
+
+//GET
+// http://localhost:5000/api/v1/units/5d36b6750e7ed60948570285/company/employees/5d36b6750e7ed60948570287
+router.get(
+  "/units/:id/company/employees/:employeeid",
+  async (req, res, next) => {
+    const status = 200;
+    try {
+      const getDoc = await Units.findById(req.params.id);
+      const employees = await getDoc.company[0].employee;
+      const response = await employees.find(
+        employee => employee.id === req.params.employeeid
+      );
+      //there's gotta be a better way of organizing this but all googling just shows mongoose schema validation
+      if (!response) {
+        throw {
+          name: "employeeError",
+          message: "Employee not found"
+        };
+
+        return;
+      }
+      res.json({ status, response });
+    } catch (error) {
+      if (error.path === "_id") {
+        error.status = 404;
+        error.message = "Unit not found";
+      } else if (error.name === "employeeError") {
+        error.status = 404;
+        next(error);
+      }
+      error.status = 404;
+      error.message = "Company not found";
+      next(error);
+    }
+  }
+);
 
 router.post("/units", async (req, res, next) => {
   const status = 201;
@@ -120,7 +175,6 @@ router.post("/units", async (req, res, next) => {
     error.status = 400;
     error.message =
       "Insert failed. Check that all required data is present and formatted properly.";
-
     next(error);
   }
 });
