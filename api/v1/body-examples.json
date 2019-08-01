@@ -47,7 +47,6 @@
         ]
     }
 ]
-
 //Just Company
 {
     "company": [
@@ -65,4 +64,13 @@
             ]
         }
     ]
+}
+//Just employee
+{
+    "first_name": "Elizabeth",
+    "last_name": "Harrison",
+    "preferred_name": "Liz",
+    "position": "Product Owner",
+    "birthday": "1984-01-22",
+    "email": "eharrison@startify.com"
 }

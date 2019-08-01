@@ -62,7 +62,7 @@ router.patch("/units/:id", async (req, res, next) => {
 router.patch("/units/:id/company", async (req, res, next) => {
   const status = 200;
   try {
-    const findOneAndUpdate = await Units.findById(
+    const findById = await Units.findById(
       req.params.id,
       (err, unit) => {
         if (err) {
@@ -163,6 +163,114 @@ router.get(
     }
   }
 );
+
+//POST
+// http://localhost:5000/api/v1/units/5d36b6750e7ed60948570285/company/employees
+
+router.post("/units/:id/company/employees", async (req, res, next) => {
+  const status = 201;
+  let response = "";
+  let theCompany = "";
+
+  //this error handling is hot garbage, WTH does good error handling look like?
+  try {
+    const findById = await Units.findById(req.params.id, (err, unit) => {
+      if (err) {
+        return;
+      }
+      try {
+        const returnEmployee = function() {
+          const employees = theCompany.employee;
+          response = employees[employees.length - 1];
+        };
+        const addEmployee = function() {
+          theCompany.employee.push(req.body);
+          unit.save();
+          returnEmployee();
+        };
+      } catch (error) {
+        error.status = 400;
+        error.message =
+          "Insert failed. Check that all required data is present and formatted properly.";
+        next(error);
+      }
+      try {
+        theCompany = unit.company[0];
+        addEmployee();
+      } catch (error) {
+        error.status = 404;
+        error.message = "Company not found";
+        next(error);
+      }
+      res.json({ status, response });
+    });
+  } catch (error) {
+    if (error.path === "_id") {
+      error.status = 404;
+      error.message = "Unit not found";
+      next(error);
+    }
+  }
+});
+
+//PATCH 
+// http://localhost:5000/api/v1/units/5d36b6750e7ed60948570285/company/employees/5d3fe332ffef3297cb41d141
+router.patch("/units/:id/company/employees/:employeeid", async (req, res, next) => {
+  let status = 201
+  let response = ""
+  let theCompany = ""
+  let theEmployee = ""
+
+  try {
+    const findById = await Units.findById(req.params.id, (err, unit) => {
+      if (err) {
+        status = 404;
+        response = "Unit not found"
+        return;
+      }
+      try {
+        theCompany = unit.company[0];
+      }
+      catch (error) {
+        status = 404;
+        response = "Company not found"
+        next(error);
+      }
+
+      theEmployee = theCompany.employee.find(employee => employee.id === req.params.employeeid)
+      
+      if (!theEmployee) {
+        status = 404;
+        response = "Employee not found"
+        return;
+      }
+
+      try {
+        for (let update in req.body) {
+          theEmployee[update] = req.body[update];
+        }
+        unit.save();
+      }
+      catch (error) {
+        status = 400;
+        response = "Update did not work, check your data"
+        next(error);
+      }
+    });
+    if (!response) { 
+      response = await Units.findById(req.params.id);
+    }
+
+    res.json({ status, response });
+  } catch (error) { 
+      console.log(error)
+      error.status = "404"
+      error.message = "Epic Fail"
+      next(error);
+  }
+
+});
+
 
 router.post("/units", async (req, res, next) => {
   const status = 201;
