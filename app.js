@@ -11,7 +11,7 @@ if (MONGO_DB_CONNECTION) {
     console.log('Could not connect to database!')
   }
   
-  //Sets some flags to use new shiny without errors
+// Sets some flags to use new shiny without errors
   mongoose.set('useNewUrlParser', true);
   mongoose.set('useFindAndModify', false);
   mongoose.set('useCreateIndex', true);

@@ -178,7 +178,6 @@ router.post("/units/:id/company/employees", async (req, res, next) => {
       if (err) {
         return;
       }
-      try {
         const returnEmployee = function() {
           const employees = theCompany.employee;
           response = employees[employees.length - 1];
@@ -188,18 +187,20 @@ router.post("/units/:id/company/employees", async (req, res, next) => {
           unit.save();
           returnEmployee();
         };
+      
+      try {
+        theCompany = unit.company[0];
+      } catch (error) {
+        error.status = 404;
+        error.message = "Company not found";
+        next(error);
+      }
+      try { 
+        addEmployee();
       } catch (error) {
         error.status = 400;
         error.message =
           "Insert failed. Check that all required data is present and formatted properly.";
-        next(error);
-      }
-      try {
-        theCompany = unit.company[0];
-        addEmployee();
-      } catch (error) {
-        error.status = 404;
-        error.message = "Company not found";
         next(error);
       }
       res.json({ status, response });
@@ -219,7 +220,6 @@ router.patch("/units/:id/company/employees/:employeeid", async (req, res, next) 
   let status = 201
   let response = ""
   let theCompany = ""
-  let theEmployee = ""
 
   try {
     const findById = await Units.findById(req.params.id, (err, unit) => {
@@ -269,6 +269,87 @@ router.patch("/units/:id/company/employees/:employeeid", async (req, res, next) 
       next(error);
   }
 
+});
+//DELETE 
+// http://localhost:5000/api/v1/units/5d36b6750e7ed60948570285/company/employees/5d3fe332ffef3297cb41d141
+router.delete("/units/:id/company/employees/:employeeid", async (req, res, next) => {
+  let status = 201
+  let response = ""
+  let theCompany = ""
+  let theEmployee = ""
+
+  try {
+    const findById = await Units.findById(req.params.id, (err, unit) => {
+      if (err) {
+        status = 404;
+        response = "Unit not found"
+        return;
+      }
+        theCompany = unit.company[0];
+        console.log(theCompany)
+      
+      if (!theCompany) {
+        status = 404;
+        response = "Company not found"
+        return;
+      }
+      theEmployeeIndex = theCompany.employee.findIndex(employee => employee.id === req.params.employeeid)
+
+      if (theEmployeeIndex === -1) {
+        status = 404;
+        response = "Employee not found"
+        return;
+      }
+
+      try {
+        theCompany.employee.splice(theEmployeeIndex, 1)
+        unit.save();
+      }
+      catch (error) {
+        status = 400;
+        response = "Update did not work, check your data"
+        next(error);
+      }
+    });
+    if (!response) { 
+      response = await Units.findById(req.params.id);
+    }
+
+    res.json({ status, response });
+  } catch (error) { 
+      console.log(error)
+      error.status = "404"
+      error.message = "Epic Fail"
+      next(error);
+  }
+
+});
+
+//GET
+// http://localhost:5000/api/v1/companies
+// http://localhost:5000/api/v1/companies?name=ko
+
+router.get("/companies/", async (req, res, next) => {
+  const status = 201;
+  let response = '';
+  const query = req.query;
+  try {
+    const unitsWithCompanies = await Units.find({ company: { $gt: [] } });
+    const companies = await unitsWithCompanies.map(unit => unit.company)
+    response = companies
+
+    const unitsWithCompanyNamesLike = await companies.filter(company => 
+      company[0].name.toLowerCase().includes(query.name.toLowerCase()) 
+    )
+    if (String(Object.keys(query)).includes(`name`)) {
+      response = unitsWithCompanyNamesLike
+    }
+    res.json({ status, response });
+  } catch (error) { 
+    error.status = 400;
+    error.message = 
+      "No Companies"
+  }
 });
 
 
