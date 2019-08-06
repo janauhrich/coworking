@@ -373,6 +373,62 @@ router.get("/companies/", async (req, res, next) => {
   }
 });
 
+//GET
+// http://localhost:5000/api/v1/employees?name=ka
+// http://localhost:5000/api/v1/employees?birthday=1989-07-11
+
+router.get("/employees", async (req, res, next) => {
+  const status = 201;
+  let response = "";
+  const query = req.query;
+
+  try {
+    const unitsWithCompanies = await Units.find({ company: { $gt: [] } });
+    const companies = await unitsWithCompanies.map(unit => unit.company);
+    const companiesWithEmployees = await companies.filter(
+      company => company[0].employee.length >= 1
+    );
+    const employees = await companiesWithEmployees.map(
+      company => company[0].employee
+    );
+    response = employees;
+
+    if (String(Object.keys(query)).includes(`name`)) {
+      // employee name query
+      const employeesWithNamesLike = await employees.filter(
+        employee =>
+          employee[0].first_name
+            .toLowerCase()
+            .includes(query.name.toLowerCase())
+          ||
+          employee[0].last_name
+            .toLowerCase()
+            .includes(query.name.toLowerCase())
+      );
+      response = employeesWithNamesLike;
+    }
+
+    if (String(Object.keys(query)).includes(`birthday`)) {
+      // employee birthday query
+      const queryBirthday = new Date(query.birthday)
+      console.log(queryBirthday)
+
+      const employeesWithBirthdaysLike = await employees.filter(
+        employee =>
+          employee[0].birthday.getTime() === queryBirthday.getTime()
+      );
+
+      response = employeesWithBirthdaysLike;
+    }
+
+    res.json({ status, response });
+  } catch (error) {
+    error.status = 400;
+    error.message = "Invalid request";
+    next(error);
+  }
+});
+
 router.post("/units", async (req, res, next) => {
   const status = 201;
   try {
